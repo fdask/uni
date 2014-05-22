@@ -447,3 +447,25 @@ function getNote($videoid) {
 
 	return false;
 }
+
+function toSeconds($time) {
+	$bits = explode(":", $time);
+
+	if (count($bits) == 2) {
+		$minutes = $bits[0];
+		$seconds = $bits[1];
+
+		$seconds += ($minutes * 60);
+
+		return $seconds;
+	}
+
+	return false;
+}
+
+function toTime($seconds) {
+	$mins = floor($seconds / 60);
+	$secs = $seconds % 60;
+
+	return "$mins:" . str_pad($secs, 2, "0");
+}
