@@ -3,61 +3,86 @@ require 'header.inc.php';
 
 $courses = getCourses();
 
-echo "<ul id='container'>";
+$courses_output = array();
 
 foreach ($courses as $course) {
 	$courseid = $course['id'];
 
+	$str = "";
+
+	// have we seen all the videos in this course?  assume true
+	$watchedallmodules = true;
+
 	$cr = courseRemaining($courseid);
-
-	echo "<li>";
-	echo "<h2 id='c_$courseid'>{$course['name']} ({$cr['count']} / {$cr['total']})</h2>";
-
 	$modules = getModules($courseid);
 
-	echo "<ul id='course_{$course['id']}'>";
-
+	$modules_output = array();
+	
 	foreach ($modules as $module) {
 		// have we seen everything in this module?  assume true
-		$watchedall = true;
+		$watchedallvideos = true;
+
+		$str2 = "";
 
 		$moduleid = $module['id'];	
 		$videos = getVideos($moduleid);
 
-		// start the output
-		$video_output = "<ul id='module_{$module['id']}'>";
-
-		foreach ($videos as $video) {
-			$video_output .= "<li>";	
-
-			if (haveWatched($video['id'])) {
-				$video_output .= "<del><a href='video.php?vid={$video['id']}'>{$video['name']}</a></del>";
-			} else {
-				$watchedall = false;
-				$video_output .= "<a href='video.php?vid={$video['id']}'>{$video['name']}</a>";
-			}
-
-			$video_output .= "</li>";
-		}
-
-		echo "<li>\n";
-
 		$mr = moduleRemaining($module['id']);
 
-		if ($watchedall) {
-			echo "<h3 id='m_{$module['id']}'><del>{$module['name']} ({$mr['count']} / {$mr['total']})</del></h3>\n";
-		} else {
-			echo "<h3 id='m_{$module['id']}'>{$module['name']} ({$mr['count']} / {$mr['total']})</h3>\n";
+		$videos_output = array();
+
+		foreach ($videos as $video) {
+			// put together an array of li's for each video
+			$str3 = "";
+			$str3 .= "<li>";	
+
+			if (haveWatched($video['id'])) {
+				$str3 .= "<del><a href='video.php?vid={$video['id']}'>{$video['name']}</a></del>";
+			} else {
+				$str3 .= "<a href='video.php?vid={$video['id']}'>{$video['name']}</a>";
+				$watchedallvideos = false;
+				$watchedallmodules = false;
+			}
+
+			$str3 .= "</li>";
+
+			$videos_output[] = $str3;
 		}
 
-		echo $video_output;
-		echo "</ul>\n";
-		echo "</li>\n";
+		// start the module output
+		$str2 .= "<li>";
+
+		if ($watchedallvideos) {
+			$str2 .= "<h3 id='m_{$module['id']}'><del>{$module['name']} ({$mr['count']} / {$mr['total']})</del></h3>\n";
+		} else {
+			$str2 .= "<h3 id='m_{$module['id']}'>{$module['name']} ({$mr['count']} / {$mr['total']})</h3>\n";
+		}
+
+		$str2 .= "<ul>";
+		$str2 .= implode("\n", $videos_output);
+		$str2 .= "</ul>";
+		$str2 .= "</li>";
+
+		$modules_output[] = $str2;
 	}
 
-	echo "</ul>";
-	echo "</li>";
+	// put together the individual course
+	$str .= "<li>";
+
+	if ($watchedallmodules) {
+		$str .= "<h2 id='c_$courseid'><del>{$course['name']} ({$cr['count']} / {$cr['total']})</del></h2>";
+	} else {
+		$str .= "<h2 id='c_$courseid'>{$course['name']} ({$cr['count']} / {$cr['total']})</h2>";
+	}
+
+	$str .= "<ul class='modules'>";
+	$str .= implode("\n", $modules_output);
+	$str .= "</ul>";
+
+	$courses_output[] = $str;
 }
 
+echo "<ul id='container'>";
+echo implode("\n", $courses_output);
 echo "</ul>";
 ?>	
