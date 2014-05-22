@@ -1,0 +1,30 @@
+del a {
+	font-color: grey;
+}
+
+a {
+	text-decoration: none;
+	color: black;
+}
+
+.course {
+	font-size: 1em;
+}
+
+.module {
+	font-size: 1.1em;
+}
+
+.video {
+	font-size: 1.2em;
+}
+
+#unwatch {
+	display: block;
+	margin-top: 20px;
+}
+
+#note {
+	width: 500px;
+	height: 300px;
+}
