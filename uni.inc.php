@@ -469,3 +469,25 @@ function toTime($seconds) {
 
 	return "$mins:" . str_pad($secs, 2, "0");
 }
+
+function lastInModule($moduleid) {
+	$query = "
+	SELECT
+		id
+	FROM
+		videos
+	WHERE
+		moduleid = $moduleid
+	ORDER BY sequence DESC
+	LIMIT 1";
+
+	$res = mysql_query($query);
+
+	if (mysql_num_rows($res)) {
+		$row = mysql_fetch_assoc($res);
+
+		return $row['id'];
+	}
+
+	return false;
+}

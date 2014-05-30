@@ -23,5 +23,5 @@ if (isset($data['videoid'])) {
 	}
 } 
 
-echo "success";
+echo json_encode("success");
 exit;

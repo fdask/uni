@@ -6,7 +6,9 @@ $.fn.scrollView = function () {
 	});
 }
 
-function server(data) {
+function server(data, completeFunc) {
+	completeFunc = completeFunc || function (data) {};
+
 	$.ajax({
 		url: "ajax.php",
 		type: "POST",
@@ -14,12 +16,15 @@ function server(data) {
 		contentType: 'application/json; charset=utf-8',
 		dataType: 'json',
 		async: true,
-		success: function (data) {
-		},
 		error: function(httpRequest, textStatus, errorThrown) {
 			console.log("status=" + textStatus + ",error=" + errorThrown);
-		}
+		},
+		complete: completeFunc
 	});
+}
+
+function test1() {
+	$("#nextButton").trigger("click");
 }
 
 $(document).ready(function() {
@@ -29,11 +34,21 @@ $(document).ready(function() {
 			action: 'watched'
 		};
 
-		server(sendme);
+		server(sendme, function (data) {
+			if ($("#playToModuleEnd").prop("checked") && $("#lastInModule").val() == "0") {
+				setTimeout(test1, 4000);
+			}
+		});
 	});
 
 	$(".navbutton").on('click', function(e) {
-		document.location.href = "video.php?vid=" + $(this).data('vid');
+		var cp = 0;
+
+		if ($("#playToModuleEnd").prop("checked")) {
+			cp = 1;
+		}
+			
+		document.location.href = "video.php?vid=" + $(this).data('vid') + "&cp=" + cp;
 	});
 
 	$("#saveNote").on('click', function(e) {
@@ -62,14 +77,18 @@ $(document).ready(function() {
 		active: false,
 		collapsible: true,
 		header: "h2",
-		heightStyle: "content"
+		heightStyle: "content",
 	});
 
 	$(".modules").accordion({
 		active: false,
 		collapsible: true,
 		header: "h3",
-		heightStyle: "content"
+		heightStyle: "content",
+		beforeActivate: function (e, ui) {
+			console.log("scrolling");
+			$(this).scrollView();
+		}
 	});
 
 	if (window.location.hash) {
@@ -81,7 +100,7 @@ $(document).ready(function() {
 
 		if (type == "c") {
 			el = $("body").find(hash).closest('h2');
-			el.trigger('click').scrollView();
+			el.trigger('click'); //.scrollView();
 		} else if (type == "m") {
 			// we have to hit the parent first
 			el = $("body").find(hash).closest('h3');
@@ -90,7 +109,7 @@ $(document).ready(function() {
 			$(p[2].childNodes[0]).trigger('click');
 
 			el.trigger('click');
-			el.scrollView();
+			//el.scrollView();
 		}
 	}
 });
