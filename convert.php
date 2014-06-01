@@ -2,20 +2,22 @@
 <?php
 require 'uni.inc.php';
 
-$query = "SELECT * FROM videos WHERE moduleid >= 229";
+$query = "SELECT * FROM videos WHERE moduleid >= 312";
 
 $res = mysql_query($query);
 
 while ($row = mysql_fetch_assoc($res)) {
 	$file = basename($row['location']);
 
-	$full = "/home/jwallace/compass/{$row['location']}";
+	$full = "/mnt/iso/{$row['location']}";
 
-	$newfile = $row['id'] . "_" . str_replace(".wmv", ".mp4", $file);
-
-	//shell_exec("/usr/bin/ffmpeg -i " . escapeshellarg($full) . " -vcodec libx264 -vpre medium /usr/share/nginx/html/uni/files/" . escapeshellarg($newfile));
-
-	copy($full, "/usr/share/nginx/html/uni/files/$newfile");
+	if (strpos($file, ".wmv") !== false) {
+		$newfile = $row['id'] . "_" . str_replace(".wmv", ".mp4", $file);
+		shell_exec("/usr/bin/ffmpeg -i " . escapeshellarg($full) . " -vcodec libx264 -vpre medium /usr/share/nginx/html/uni/files/" . escapeshellarg($newfile));
+	} else {
+		$newfile = $row['id'] . "_" . $file;
+		copy($full, "/usr/share/nginx/html/uni/files/$newfile");
+	}
 
 	$query2 = "
 	UPDATE

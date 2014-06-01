@@ -426,7 +426,39 @@ function saveNote($videoid, $note) {
 	return mysql_query($query) or die(mysql_error());
 }
 
-function getNote($videoid) {
+function getCourseNotes($courseid) {
+	$notes = array();
+
+	$mods = getModules($courseid);
+
+	foreach ($mods as $mod) {
+		$note = getModuleNotes($mod['id']);
+
+		if ($note) {
+			$notes[$mod['id']] = $note;
+		}
+	}
+
+	return empty($notes) ? false : $notes;
+}
+
+function getModuleNotes($moduleid) {
+	$notes = array();
+
+	$vids = getVideos($moduleid);
+
+	foreach ($vids as $vid) {
+		$note = getVideoNote($vid['id']);
+
+		if ($note) {
+			$notes[] = getVideoNote($vid['id']);
+		}
+	}
+
+	return empty($notes) ? false : $notes;
+}
+
+function getVideoNote($videoid) {
 	$query = "
 	SELECT
 		id,
@@ -464,10 +496,20 @@ function toSeconds($time) {
 }
 
 function toTime($seconds) {
-	$mins = floor($seconds / 60);
-	$secs = $seconds % 60;
+	// calculate the hours
+	$hours = floor($seconds / 60 / 60);
 
-	return "$mins:" . str_pad($secs, 2, "0");
+	// calculate the minutes
+	$mins = floor(($seconds - ($hours * 60 * 60)) / 60);
+
+	// calculate the seconds
+	$secs = floor($seconds - (($hours * 60 * 60) + ($mins * 60)));
+
+	if ($hours > 0) {
+		return "$hours:$mins:" . str_pad($secs, 2, "0");
+	} else {
+		return "$mins:" . str_pad($secs, 2, "0");
+	}
 }
 
 function lastInModule($moduleid) {

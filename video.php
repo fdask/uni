@@ -13,7 +13,7 @@ if (lastInModule($v['moduleid']) == $videoid) {
 echo "<input type='hidden' name='lastInModule' id='lastInModule' value='$lim' />";
 echo "<button type='button' id='unwatch' data-vid='$videoid'>Clear Watches</button>";
 
-$note = getNote($videoid);
+$note = getVideoNote($videoid);
 ?>
 <div id='mainarea'>
 	<div id='video-container'>

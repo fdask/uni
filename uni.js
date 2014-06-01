@@ -1,3 +1,24 @@
+// from http://davidwalsh.name/fullscreen
+function launchFullscreen(element) {
+	if (element.requestFullscreen) {
+		element.requestFullscreen();
+	} else if (element.mozRequestFullScreen) {
+		element.mozRequestFullScreen();
+	} else if (element.webkitRequestFullscreen) {
+		element.webkitRequestFullscreen();
+	} else if (element.msRequestFullscreen) {
+		element.msRequestFullscreen();
+	}
+}
+
+function isFullScreen(element) {
+	if (document.mozFullscreen) {
+		return document.mozFullscreen;
+	} else if (document.webkitIsFullscreen) {
+		return document.webkitIsFullscreen;
+	}
+}
+
 $.fn.scrollView = function () {
 	return this.each(function () {
 		$('html, body').animate({
@@ -23,10 +44,6 @@ function server(data, completeFunc) {
 	});
 }
 
-function test1() {
-	$("#nextButton").trigger("click");
-}
-
 $(document).ready(function() {
 	$("#video").on('ended', function(e) {
 		var sendme = {
@@ -47,7 +64,11 @@ $(document).ready(function() {
 		if ($("#playToModuleEnd").prop("checked")) {
 			cp = 1;
 		}
-			
+
+		// is full screen?  ideally when someone is playing automatically to the next video, keep them fullscreen!
+		// TODO
+		var fs = 0;
+
 		document.location.href = "video.php?vid=" + $(this).data('vid') + "&cp=" + cp;
 	});
 
@@ -112,4 +133,8 @@ $(document).ready(function() {
 			//el.scrollView();
 		}
 	}
+
+	$(".fa-file-o").click(function () {
+		event.stopPropagation();
+	});
 });

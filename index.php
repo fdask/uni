@@ -17,6 +17,8 @@ foreach ($courses as $course) {
 	$modules = getModules($courseid);
 
 	$modules_output = array();
+	$total_course_time = 0;
+	$watched_course_time = 0;
 	
 	foreach ($modules as $module) {
 		// have we seen everything in this module?  assume true
@@ -47,6 +49,13 @@ foreach ($courses as $course) {
 				$watchedallmodules = false;
 			}
 
+			// get video notes
+			$video_note = getVideoNote($video['id']);
+
+			if ($video_note) {
+				$str3 .= "<i class='fa fa-file-o'></i>";
+			}
+
 			$total_module_time += toSeconds($video['length']);
 
 			$str3 .= "</li>";
@@ -58,27 +67,47 @@ foreach ($courses as $course) {
 		$str2 .= "<li>";
 
 		if ($watchedallvideos) {
-			$str2 .= "<h3 id='m_{$module['id']}'><del>{$module['name']} ({$mr['count']} / {$mr['total']}) - (" . toTime($watched_module_time) . " / " . toTime($total_module_time) . ")</del></h3>\n";
+			$str2 .= "<h3 id='m_{$module['id']}'><del>{$module['name']} ({$mr['count']} / {$mr['total']}) - (" . toTime($watched_module_time) . " / " . toTime($total_module_time) . ")</del>";
 		} else {
-			$str2 .= "<h3 id='m_{$module['id']}'>{$module['name']} ({$mr['count']} / {$mr['total']})  - (" . toTime($watched_module_time) . " / " . toTime($total_module_time) . ")</h3>\n";
+			$str2 .= "<h3 id='m_{$module['id']}'>{$module['name']} ({$mr['count']} / {$mr['total']})  - (" . toTime($watched_module_time) . " / " . toTime($total_module_time) . ")";
 		}
 
+		// get module notes
+		$module_notes = getModuleNotes($moduleid);
+
+		if ($module_notes) {
+			$str2 .= "<i class='fa fa-file-o'></i>";
+		}
+
+		$str2 .= "</h3>";
 		$str2 .= "<ul>";
 		$str2 .= implode("\n", $videos_output);
 		$str2 .= "</ul>";
 		$str2 .= "</li>";
 
 		$modules_output[] = $str2;
+
+		$watched_course_time += $watched_module_time;
+		$total_course_time += $total_module_time;
 	}
 
 	// put together the individual course
 	$str .= "<li>";
 
 	if ($watchedallmodules) {
-		$str .= "<h2 id='c_$courseid'><del>{$course['name']} ({$cr['count']} / {$cr['total']})</del></h2>";
+		$str .= "<h2 id='c_$courseid'><del>{$course['name']} ({$cr['count']} / {$cr['total']}) - (" . toTime($watched_course_time) . " / " . toTime($total_course_time) . ")</del>";
 	} else {
-		$str .= "<h2 id='c_$courseid'>{$course['name']} ({$cr['count']} / {$cr['total']})</h2>";
+		$str .= "<h2 id='c_$courseid'>{$course['name']} ({$cr['count']} / {$cr['total']}) - (" . toTime($watched_course_time) . " / " . toTime($total_course_time) . ")";
 	}
+
+	// get the course Notes
+	$course_notes = getCourseNotes($courseid);
+
+	if ($course_notes) {
+		$str .= "<i class='fa fa-file-o'></i>";
+	}
+
+	$str .= "</h2>";
 
 	$str .= "<ul class='modules'>";
 	$str .= implode("\n", $modules_output);
