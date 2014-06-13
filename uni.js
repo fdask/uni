@@ -94,6 +94,31 @@ $(document).ready(function() {
 		server(sendme);
 	});
 
+	$("#clearBookmark").on('click', function(e) {
+		var sendme = {
+			videoid: $("#videoid").html(),
+			action: 'clearBookmark'
+		};
+
+		server(sendme);
+	});
+
+	$("#jumpToBookmark").on('click', function(e) {
+		$("#video").get(0).currentTime = $(this).data('time');
+	});
+
+	$("#addBookmark").on('click', function(e) {
+		$('#video').get(0).pause();
+
+		var sendme = {
+			videoid: $("#videoid").html(),
+			time: $('#video').get(0).currentTime,
+			action: 'addBookmark'
+		};
+
+		server(sendme);
+	});
+
 	$("#container").accordion({
 		active: false,
 		collapsible: true,

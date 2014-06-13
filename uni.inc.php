@@ -564,7 +564,8 @@ function getBookmark($videoid) {
 	FROM
 		bookmarks
 	WHERE
-		videoid = $videoid";
+		videoid = $videoid
+	ORDER BY time DESC";
 
 	$res = mysql_query($query);
 
@@ -575,4 +576,10 @@ function getBookmark($videoid) {
 	}
 
 	return false;	
+}
+
+function clearBookmark($videoid) {
+	$query = "DELETE FROM bookmarks WHERE videoid = $videoid";
+
+	return mysql_query($query);
 }

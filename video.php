@@ -12,6 +12,16 @@ if (lastInModule($v['moduleid']) == $videoid) {
 
 echo "<input type='hidden' name='lastInModule' id='lastInModule' value='$lim' />";
 echo "<button type='button' id='unwatch' data-vid='$videoid'>Clear Watches</button>";
+$bookmark = getBookmark($videoid);
+echo "<button type='button' id='clearBookmark' data-vid='$videoid' ";
+if (!$bookmark) {
+	echo "disabled='disabled'";
+}
+echo ">Clear Bookmark</button>";
+
+if ($bookmark) {
+	echo "<button type='button' id='jumpToBookmark' data-time='{$bookmark['time']}'>Jump To Bookmark</button>";
+}
 
 $note = getVideoNote($videoid);
 ?>
@@ -28,6 +38,8 @@ $note = getVideoNote($videoid);
 			} else {
 				echo "<button class='navbutton' id='previousButton' type='button' disabled='disabled'>Previous</button>";
 			}
+
+			echo "<button id='addBookmark' type='button' data-vid='{$videoid}'>Add Bookmark</button>";
 
 			if ($n_id) {
 				echo "<button class='navbutton' id='nextButton' type='button' data-vid='{$n_id}'>Next</button>";

@@ -19,6 +19,13 @@ if (isset($data['videoid'])) {
 			$note = $data['note'];
 			saveNote($vid, $note);
 			break;
+		case "clearBookmark":
+			clearBookmark($vid);
+			break;
+		case "addBookmark":
+			$time = $data['time'];
+			addBookmark($vid, $time);
+			break;
 		default:
 	}
 } 
