@@ -490,6 +490,14 @@ function toSeconds($time) {
 		$seconds += ($minutes * 60);
 
 		return $seconds;
+	} else if (count($bits) === 3) {
+		$hours = $bits[0];
+		$minutes = $bits[1];
+		$seconds = $bits[2];
+
+		$seconds += ($minutes * 60) + ($hours * 3600);
+
+		return $seconds;
 	}
 
 	return false;
@@ -497,19 +505,17 @@ function toSeconds($time) {
 
 function toTime($seconds) {
 	// calculate the hours
-	$hours = floor($seconds / 60 / 60);
-
-	// calculate the minutes
-	$mins = floor(($seconds - ($hours * 60 * 60)) / 60);
-
-	// calculate the seconds
-	$secs = floor($seconds - (($hours * 60 * 60) + ($mins * 60)));
+	$hours = floor($seconds / 3600);
+	$mins = floor(floor($seconds % 3600) / 60);
+	$secs = $seconds % 60;
 
 	if ($hours > 0) {
-		return "$hours:$mins:" . str_pad($secs, 2, "0");
+		$ret = "$hours:" . str_pad($mins, 2, "0", STR_PAD_LEFT) . ":" . str_pad($secs, 2, "0", STR_PAD_LEFT);
 	} else {
-		return "$mins:" . str_pad($secs, 2, "0");
+		$ret = str_pad($mins, 2, "0", STR_PAD_LEFT) . ":" . str_pad($secs, 2, "0", STR_PAD_LEFT);
 	}
+
+	return $ret;
 }
 
 function lastInModule($moduleid) {
@@ -532,4 +538,41 @@ function lastInModule($moduleid) {
 	}
 
 	return false;
+}
+
+function addBookmark($videoid, $time) {
+	$query = "
+	INSERT INTO bookmarks (
+		videoid,
+		time,
+		date
+	) VALUES (
+		$videoid,
+		'" . mysql_real_escape_string($time) . "',
+		NOW()
+	)";
+
+	return mysql_query($query);
+}
+
+function getBookmark($videoid) {
+	$query = "
+	SELECT
+		videoid,
+		time,
+		date
+	FROM
+		bookmarks
+	WHERE
+		videoid = $videoid";
+
+	$res = mysql_query($query);
+
+	if (mysql_num_rows($res)) {
+		$row = mysql_fetch_assoc($res);
+
+		return $row;	
+	}
+
+	return false;	
 }
