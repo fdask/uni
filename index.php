@@ -6,6 +6,9 @@ $courses = getCourses();
 $courses_output = array();
 
 foreach ($courses as $course) {
+	// true if no videos in this course have been watched
+	$new = true;
+
 	$courseid = $course['id'];
 
 	$str = "";
@@ -43,6 +46,7 @@ foreach ($courses as $course) {
 			if (haveWatched($video['id'])) {
 				$str3 .= "<del><a href='video.php?vid={$video['id']}'>{$video['name']} - {$video['length']}</a></del>";
 				$watched_module_time += toSeconds($video['length']);
+				$new = false;
 			} else {
 				$str3 .= "<a href='video.php?vid={$video['id']}'>{$video['name']} - {$video['length']}</a>";
 				$watchedallvideos = false;
@@ -92,12 +96,10 @@ foreach ($courses as $course) {
 	}
 
 	// put together the individual course
-	$str .= "<li>";
-
 	if ($watchedallmodules) {
-		$str .= "<h2 id='c_$courseid'><del>{$course['name']} ({$cr['count']} / {$cr['total']}) - (" . toTime($watched_course_time) . " / " . toTime($total_course_time) . ")</del>";
+		$str .= "<li class='completed'><h2 id='c_$courseid'><del>{$course['name']} ({$cr['count']} / {$cr['total']}) - (" . toTime($watched_course_time) . " / " . toTime($total_course_time) . ")</del>";
 	} else {
-		$str .= "<h2 id='c_$courseid'>{$course['name']} ({$cr['count']} / {$cr['total']}) - (" . toTime($watched_course_time) . " / " . toTime($total_course_time) . ")";
+		$str .= "<li class='" . (($new) ? 'new' : 'started') . "'><h2 id='c_$courseid'>{$course['name']} ({$cr['count']} / {$cr['total']}) - (" . toTime($watched_course_time) . " / " . toTime($total_course_time) . ")";
 	}
 
 	// get the course Notes
@@ -115,7 +117,12 @@ foreach ($courses as $course) {
 
 	$courses_output[] = $str;
 }
-
+?>
+Show
+<label for='showNew'>New</label> <input type='checkbox' name='showNew' id='showNew' checked='checked'>
+<label for='showStarted'>Started</label> <input type='checkbox' name='showStarted' id='showStarted' checked='checked'>
+<label for='showCompleted'>Completed</label> <input type='checkbox' name='showCompleted' id='showCompleted' checked='checked'>
+<?php
 echo "<ul id='container'>";
 echo implode("\n", $courses_output);
 echo "</ul>";

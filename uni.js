@@ -53,7 +53,9 @@ $(document).ready(function() {
 
 		server(sendme, function (data) {
 			if ($("#playToModuleEnd").prop("checked") && $("#lastInModule").val() == "0") {
-				setTimeout(test1, 4000);
+				setTimeout(function () {
+					document.location.href = "video.php?vid=" + $("#nextButton").data('vid') + "&cp=1";
+				}, 4000);
 			}
 		});
 	});
@@ -161,5 +163,29 @@ $(document).ready(function() {
 
 	$(".fa-file-o").click(function () {
 		event.stopPropagation();
+	});
+
+	$("#showCompleted").change(function () {
+		if ($(this).prop('checked')) {
+			$(".completed").show();
+		} else {
+			$(".completed").hide();
+		}
+	});
+
+	$("#showStarted").change(function () {
+		if ($(this).prop('checked')) {
+			$(".started").show();
+		} else {
+			$(".started").hide();
+		}
+	});
+
+	$("#showNew").change(function () {
+		if ($(this).prop('checked')) {
+			$(".new").show();
+		} else {
+			$(".new").hide();
+		}
 	});
 });
