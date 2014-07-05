@@ -153,18 +153,20 @@ function deleteVideo($videoid) {
 function getVideos($moduleid) {
 	$query = "
 	SELECT
-		id,
-		moduleid,
-		name,
-		length,
-		location,
-		sequence
+		v.id,
+		v.moduleid,
+		v.name,
+		v.length,
+		v.location,
+		v.sequence,
+		bm.time
 	FROM
-		videos
+		videos v
+	LEFT JOIN bookmarks bm ON (v.id = bm.videoid)
 	WHERE
-		moduleid = $moduleid
+		v.moduleid = $moduleid
 	ORDER BY sequence";
-		
+
 	$res = mysql_query($query);
 
 	if (mysql_num_rows($res)) {
@@ -541,6 +543,9 @@ function lastInModule($moduleid) {
 }
 
 function addBookmark($videoid, $time) {
+	// we only want to allow ONE bookmark per course!  make this so
+	clearBookmark($videoid);
+
 	$query = "
 	INSERT INTO bookmarks (
 		videoid,

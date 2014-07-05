@@ -9,6 +9,9 @@ foreach ($courses as $course) {
 	// true if no videos in this course have been watched
 	$new = true;
 
+	// true if a bookmark exists in this course
+	$course_bookmark = false;
+
 	$courseid = $course['id'];
 
 	$str = "";
@@ -26,6 +29,9 @@ foreach ($courses as $course) {
 	foreach ($modules as $module) {
 		// have we seen everything in this module?  assume true
 		$watchedallvideos = true;
+
+		// true if there is a bookmarked video in this module
+		$module_bookmark = false;
 
 		$str2 = "";
 
@@ -51,6 +57,12 @@ foreach ($courses as $course) {
 				$str3 .= "<a href='video.php?vid={$video['id']}'>{$video['name']} - {$video['length']}</a>";
 				$watchedallvideos = false;
 				$watchedallmodules = false;
+			}
+
+			if ($video['time']) {
+				$str3 .= "<i class='fa fa-bookmark-o'></i>";
+				$course_bookmark = true;
+				$module_bookmark = true;
 			}
 
 			// get video notes
@@ -83,6 +95,10 @@ foreach ($courses as $course) {
 			$str2 .= "<i class='fa fa-file-o'></i>";
 		}
 
+		if ($module_bookmark) {
+			$str2 .= "<i class='fa fa-bookmark-o'></i>";
+		}
+
 		$str2 .= "</h3>";
 		$str2 .= "<ul>";
 		$str2 .= implode("\n", $videos_output);
@@ -107,6 +123,10 @@ foreach ($courses as $course) {
 
 	if ($course_notes) {
 		$str .= "<i class='fa fa-file-o'></i>";
+	}
+
+	if ($course_bookmark) {
+		$str .= "<i class='fa fa-bookmark-o'></i>";
 	}
 
 	$str .= "</h2>";
