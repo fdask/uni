@@ -88,7 +88,7 @@ var Video = function (id, htmlObj, autoload) {
 				}
 			} else {
 				if ("bookmarkClear" in this.els) {
-					$(this.els.bookmarkJump).attr("disabled", "disabled");
+					$(this.els.bookmarkClear).attr("disabled", "disabled");
 				}
 
 				if ("bookmarkJump" in this.els) {
@@ -118,7 +118,10 @@ var Video = function (id, htmlObj, autoload) {
 
 			if (_videoSrc != null) {
 				if ("video" in this.els) {
+					// update the src attribute for the video
 					$(this.els.video).attr("src", _videoSrc);	
+
+					// 
 				} 
 			} 
 		}
@@ -154,27 +157,32 @@ var Video = function (id, htmlObj, autoload) {
 			_els = newVal;
 
 			// assign the callbacks to the buttons
-			for (el in this.els) {
+			for (el in _els) {
 				switch (el) {
 					case 'bookmarkSet':
-						$(this.els.el).on('click', this.bookmarkSet);
+						$(_els[el]).on('click', $.proxy(this.bookmarkSet, this));
 						break;
 					case 'bookmarkClear':
-						$(this.els.el).on('click', this.bookmarkClear);
+						$(_els[el]).on('click', $.proxy(this.bookmarkClear, this));
 						break;
 					case 'bookmarkJump':
-						$(this.els.el).on('click', this.bookmarkJump);
+						$(_els[el]).on('click', $.proxy(this.bookmarkJump, this));
 						break;
 					case 'noteSet':
-						$(this.els.el).on('click', this.noteSet);
+						$(_els[el]).on('click', $.proxy(this.noteSet, this));
 						break;
 					case 'watchClear':
-						$(this.els.el).on('click', this.watchClear);
+						$(_els[el]).on('click', $.proxy(this.watchClear, this));
 						break;
 					case 'navNext':
+						$(_els[el]).on('click', $.proxy(this.navNext, this));
 						break;
 					case 'navPrev':
+						$(_els[el]).on('click', $.proxy(this.navPrev, this));
 						break;	
+					case 'video':
+						$(_els[el]).on('timeupdate', $.proxy(this.videoTimeUpdate, this));
+						break;
 					default:
 				}
 			}
@@ -197,17 +205,19 @@ Video.prototype = function () {
 			this.watched = false;
 		});
 	}, 
-	watchSet = function () {
+	watchSet = function (passFunc) {
 		this.transmit.call(this, {
 			videoid: this.id,
 	    	action: 'watched'
 		}, function () {
 			this.watched = true;
+
+			passFunc();
 		});
 	},
 	noteSet = function () {
-		var note = this.els.noteEl.value;
-		
+		var note = $(this.els.note).val();
+
 		this.transmit.call(this, {
 			videoid: this.id,
 			action: 'saveNote',
@@ -217,8 +227,8 @@ Video.prototype = function () {
 		});
 	},
 	bookmarkSet = function () {
-		var curTime = this.els.videoEl.currentTime;
-		
+		var curTime = $(this.els.video).get(0).currentTime;
+
 		this.transmit.call(this, {
 			videoid: this.id,
 			time: curTime,
@@ -237,7 +247,7 @@ Video.prototype = function () {
 	},
 	bookmarkJump = function () {
 		if (this.bookmark) {
-			this.els.videoEl.currentTime = this.bookmark;
+			$(this.els.video).get(0).currentTime = this.bookmark;
 		}
 	},
 	transmit = function (data, successFunc) {
@@ -279,13 +289,49 @@ Video.prototype = function () {
 				this.watched = data.lastwatch;
 				this.loaded = true;
 
-				console.log(this);
+				// update the url to reflect the current id
+				history.pushState({}, this.name, "http://192.168.2.14/uni/video.php?vid=" + this.id);
 			} else {
 				// error
 				console.log("error condition!");
 				console.log(data, stat);
 			}
 		});
+	},
+	videoTimeUpdate = function () {
+		var vid = $(this.els.video).get(0);
+
+		if (vid.currentTime === vid.duration) {
+			// video is over!
+			this.watchSet.call(this, $.proxy(function () {
+				if ("moduleEnd" in this.els) {
+					if ($(this.els.moduleEnd).prop("checked") && !this.lastInModule) {
+						// advance to the next video
+						this.id = this.nextId;
+
+						if (!this.autoload) {
+							this.load.call(this);	
+						}
+					}
+				}
+			}, this));
+		}
+	},
+	navNext = function () {
+		// advance to the next video
+		this.id = this.nextId;
+
+		if (!this.autoload) {
+			this.load.call(this);	
+		}
+	}, 
+	navPrev = function () {
+		// advance to the next video
+		this.id = this.prevId;
+
+		if (!this.autoload) {
+			this.load.call(this);	
+		}
 	};
 
 	return {
@@ -296,6 +342,9 @@ Video.prototype = function () {
 		bookmarkSet: bookmarkSet,
 		bookmarkClear: bookmarkClear,
 		bookmarkJump: bookmarkJump,
-		transmit: transmit
+		transmit: transmit,
+		videoTimeUpdate: videoTimeUpdate,
+		navNext: navNext,
+		navPrev: navPrev
 	};
 }();

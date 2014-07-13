@@ -27,6 +27,29 @@ function getCourses() {
 	return false;
 }
 
+function getCourse($courseid) {
+	$query = "
+	SELECT
+		id,
+		name,
+		company,
+		link
+	FROM
+		courses
+	WHERE
+		id = " . intval($courseid);
+
+	$res = mysql_query($query) or die(mysql_error());
+
+	if (mysql_num_rows($res)) {
+		$row = mysql_fetch_assoc($res);
+
+		return $row;
+	}
+
+	return false;
+}
+
 function addModule($course_id, $module_sequence, $module_name) {
 	$query = "
 	INSERT INTO modules (
@@ -208,6 +231,49 @@ function getVideo($videoid) {
 
 	if (mysql_num_rows($res)) {
 		$row = mysql_fetch_assoc($res);
+
+		return $row;
+	}
+
+	return false;
+}
+
+function getVideoObject($videoid) {
+	$query = "
+   SELECT
+      v.id,
+      v.moduleid,
+      v.name,
+      v.length,
+      v.location AS loc,
+      v.sequence,
+      m.name AS modulename,
+      m.id AS moduleid,
+      c.name AS coursename,
+      c.id AS courseid,
+		w.date AS lastwatch,
+		b.time AS bookmark,
+		n.note AS note
+   FROM
+      videos v
+   INNER JOIN
+      modules m ON (v.moduleid = m.id)
+   INNER JOIN
+      courses c ON (m.courseid = c.id)
+	LEFT JOIN watched w ON (w.videoid = v.id)
+	LEFT JOIN bookmarks b ON (b.videoid = v.id)
+	LEFT JOIN notes n ON (n.videoid = v.id)
+   WHERE
+      v.id = $videoid
+	GROUP BY v.id";
+
+	$res = mysql_query($query) or die(mysql_error());
+
+	if (mysql_num_rows($res) > 0) {
+		$row = mysql_fetch_assoc($res);
+		$row['navNext'] = getNextVideo($videoid);
+		$row['navPrev'] = getPrevVideo($videoid);
+		$row['last'] = lastInModule($videoid);
 
 		return $row;
 	}
@@ -588,3 +654,143 @@ function clearBookmark($videoid) {
 
 	return mysql_query($query);
 }
+
+function getCourseNav($courses) {
+	$courses_output = array();
+
+	foreach ($courses as $course) {
+		// true if no videos in this course have been watched
+		$new = true;
+
+		// true if a bookmark exists in this course
+		$course_bookmark = false;
+
+		$courseid = $course['id'];
+
+		$str = "";
+
+		// have we seen all the videos in this course?  assume true
+		$watchedallmodules = true;
+
+		$cr = courseRemaining($courseid);
+		$modules = getModules($courseid);
+
+		$modules_output = array();
+		$total_course_time = 0;
+		$watched_course_time = 0;
+		
+		foreach ($modules as $module) {
+			// have we seen everything in this module?  assume true
+			$watchedallvideos = true;
+
+			// true if there is a bookmarked video in this module
+			$module_bookmark = false;
+
+			$str2 = "";
+
+			$moduleid = $module['id'];	
+			$videos = getVideos($moduleid);
+
+			$mr = moduleRemaining($module['id']);
+
+			$videos_output = array();
+			$total_module_time = 0;
+			$watched_module_time = 0;
+
+			foreach ($videos as $video) {
+				// put together an array of li's for each video
+				$str3 = "";
+				$str3 .= "<li>";	
+
+				if (haveWatched($video['id'])) {
+					$str3 .= "<del><a href='video.php?vid={$video['id']}'>{$video['name']} - {$video['length']}</a></del>";
+					$watched_module_time += toSeconds($video['length']);
+					$new = false;
+				} else {
+					$str3 .= "<a href='video.php?vid={$video['id']}'>{$video['name']} - {$video['length']}</a>";
+					$watchedallvideos = false;
+					$watchedallmodules = false;
+				}
+
+				if ($video['time']) {
+					$str3 .= "<i class='fa fa-bookmark-o'></i>";
+					$course_bookmark = true;
+					$module_bookmark = true;
+				}
+
+				// get video notes
+				$video_note = getVideoNote($video['id']);
+
+				if ($video_note) {
+					$str3 .= "<i class='fa fa-file-o'></i>";
+				}
+
+				$total_module_time += toSeconds($video['length']);
+
+				$str3 .= "</li>";
+
+				$videos_output[] = $str3;
+			}
+
+			// start the module output
+			$str2 .= "<li>";
+
+			if ($watchedallvideos) {
+				$str2 .= "<h3 id='m_{$module['id']}'><del>{$module['name']} ({$mr['count']} / {$mr['total']}) - (" . toTime($watched_module_time) . " / " . toTime($total_module_time) . ")</del>";
+			} else {
+				$str2 .= "<h3 id='m_{$module['id']}'>{$module['name']} ({$mr['count']} / {$mr['total']})  - (" . toTime($watched_module_time) . " / " . toTime($total_module_time) . ")";
+			}
+
+			// get module notes
+			$module_notes = getModuleNotes($moduleid);
+
+			if ($module_notes) {
+				$str2 .= "<i class='fa fa-file-o'></i>";
+			}
+
+			if ($module_bookmark) {
+				$str2 .= "<i class='fa fa-bookmark-o'></i>";
+			}
+
+			$str2 .= "</h3>";
+			$str2 .= "<ul>";
+			$str2 .= implode("\n", $videos_output);
+			$str2 .= "</ul>";
+			$str2 .= "</li>";
+
+			$modules_output[] = $str2;
+
+			$watched_course_time += $watched_module_time;
+			$total_course_time += $total_module_time;
+		}
+
+		// put together the individual course
+		if ($watchedallmodules) {
+			$str .= "<li class='completed'><h2 id='c_$courseid'><del>{$course['name']} ({$cr['count']} / {$cr['total']}) - (" . toTime($watched_course_time) . " / " . toTime($total_course_time) . ")</del>";
+		} else {
+			$str .= "<li class='" . (($new) ? 'new' : 'started') . "'><h2 id='c_$courseid'>{$course['name']} ({$cr['count']} / {$cr['total']}) - (" . toTime($watched_course_time) . " / " . toTime($total_course_time) . ")";
+		}
+
+		// get the course Notes
+		$course_notes = getCourseNotes($courseid);
+
+		if ($course_notes) {
+			$str .= "<i class='fa fa-file-o'></i>";
+		}
+
+		if ($course_bookmark) {
+			$str .= "<i class='fa fa-bookmark-o'></i>";
+		}
+
+		$str .= "</h2>";
+
+		$str .= "<ul class='modules'>";
+		$str .= implode("\n", $modules_output);
+		$str .= "</ul>";
+
+		$courses_output[] = $str;
+	}
+
+	return "<ul id='container'>" . implode("\n", $courses_output) . "</ul>";
+}
+?>

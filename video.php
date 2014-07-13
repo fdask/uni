@@ -1,57 +1,48 @@
 <?php
 require 'header.inc.php';
-
-$p_id = getPrevVideo($videoid);
-$n_id = getNextVideo($videoid);
-
-$lim = 0;
-
-if (lastInModule($v['moduleid']) == $videoid) {
-	$lim = 1;
-}
-
-echo "<input type='hidden' name='lastInModule' id='lastInModule' value='$lim' />";
-echo "<button type='button' id='unwatch' data-vid='$videoid'>Clear Watches</button>";
-$bookmark = getBookmark($videoid);
-echo "<button type='button' id='clearBookmark' data-vid='$videoid' ";
-if (!$bookmark) {
-	echo "disabled='disabled'";
-}
-echo ">Clear Bookmark</button>";
-
-if ($bookmark) {
-	echo "<button type='button' id='jumpToBookmark' data-time='{$bookmark['time']}'>Jump To Bookmark</button>";
-}
-
-$note = getVideoNote($videoid);
 ?>
-<div id='mainarea'>
-	<div id='video-container'>
-		<video id='video' width="600" controls autoplay>
-			<source src="<?php echo $v['location']; ?>" type="video/mp4">
-			Your browser does not support the video tag.
-		</video>
-		<div id='video-controls'>
-			<?php
-			if ($p_id) {
-				echo "<button class='navbutton' id='previousButton' type='button' data-vid='{$p_id}'>Previous</button>";
-			} else {
-				echo "<button class='navbutton' id='previousButton' type='button' disabled='disabled'>Previous</button>";
-			}
+      <button type='button' id='unwatch' disabled='disabled'>Clear Watches</button>
+      <button type='button' id='clearBookmark' disabled='disabled'>Clear Bookmark</button>
+      <button type='button' id='jumpToBookmark' disabled='disabled'>Jump To Bookmark</button>
 
-			echo "<button id='addBookmark' type='button' data-vid='{$videoid}'>Add Bookmark</button>";
+      <div id='mainarea'>
+         <div id='video-container'>
+            <video id='video' width="600" controls autoplay>
+               <source src="" type="video/mp4">
+               Your browser does not support the video tag.
+            </video>
+            <div id='video-controls'>
+               <button class='navbutton' id='previousButton' type='button' disabled='disabled'>Previous</button>
+               <button id='addBookmark' type='button'>Add Bookmark</button>
+               <button class='navbutton' id='nextButton' type='button' disabled='disabled'>Next</button>
+            </div>
+         </div>
 
-			if ($n_id) {
-				echo "<button class='navbutton' id='nextButton' type='button' data-vid='{$n_id}'>Next</button>";
-			} else {
-				echo "<button class='navbutton' id='nextButton' type='button' disabled='disabled'>Next</button>";
-			}
+         <input type='checkbox' name='playToModuleEnd' id='playToModuleEnd' /> <label for='playToModuleEnd'>Play to Module End</label><br>
+         <textarea id='note'></textarea>
+         <button type='button' id='saveNote'>Save Note</button>
+      </div>
+      <div id='coursenav'>
+      </div>
+		<?php
+		if (isset($_GET['vid'])) {
 			?>
-		</div>
-	</div>
-
-	<input type='checkbox' name='playToModuleEnd' id='playToModuleEnd' <?php if (isset($_GET['cp']) && $_GET['cp'] == "1") echo "checked='checked'"; ?>/> <label for='playToModuleEnd'>Play to Module End</label><br>
-	<textarea id='note'><?php if ($note) echo $note['note']; ?></textarea>
-	<button type='button' id='saveNote' data-vid='<?php echo $videoid; ?>'>Save Note</button>
-	<span id='videoid' style='display: none;'><?php echo $v['id']; ?></span>
-</div>
+		<script>
+		var myVid = new Video(<?php echo $_GET['vid']; ?>, {
+			video: "#video",
+			note: "#note",
+			bookmarkSet: "#addBookmark",
+			bookmarkClear: "#clearBookmark",
+			bookmarkJump: "#jumpToBookmark",
+			noteSet: "#saveNote",
+			watchClear: "#unwatch",
+			navNext: "#nextButton",
+			navPrev: "#previousButton",
+			moduleEnd: "#playToModuleEnd"
+		});
+		</script>
+			<?php
+		}
+		?>
+	</body>
+</html>
