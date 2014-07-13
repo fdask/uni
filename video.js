@@ -1,15 +1,9 @@
 var Video = function (id, htmlObj, autoload) {
-	this.name = null;
 	this.sequence = null;
-	this.moduleId = null;
-	this.moduleName = null;
-	this.courseId = null;
-	this.courseName = null;
 	this.lastInModule = null;
 	this.vidLength = null;
 	this.loaded = false;
 	this.autoload = autoload || true; 
-	this.testing = {test1: 'cheese'};
 
 	// private variables
 	var _id = null;
@@ -21,6 +15,11 @@ var Video = function (id, htmlObj, autoload) {
 	var _bookmark = null;
 	var _videoSrc = null;
 	var _watched = null;
+	var _courseName = null;
+	var _courseId = null;
+	var _moduleName = null;
+	var _moduleId = null
+	var _videoName = null;
 
 	Object.defineProperty(this, "id", {
 		get: function () {
@@ -31,6 +30,71 @@ var Video = function (id, htmlObj, autoload) {
 			
 			if (this.autoload) {
 				this.load.call(this);
+			}
+		}
+	});
+
+	Object.defineProperty(this, "videoName", {
+		get: function () {
+			return _videoName;
+		},
+		set: function (newVal) {
+			_videoName = newVal;
+
+			if ("videoLink" in this.els) {
+				$(this.els.videoLink).html(_videoName);
+			}
+		}
+	});
+
+	Object.defineProperty(this, "moduleId", {
+		get: function () {
+			return _moduleId;
+		},
+		set: function (newVal) {
+			_moduleId = newVal;
+
+			if ("moduleLink" in this.els) {
+				$(this.els.moduleLink).attr("href", "index.php#m_" + _moduleId);
+			}
+		}
+	});
+
+	Object.defineProperty(this, "moduleName", {
+		get: function () {
+			return _moduleName;
+		},
+		set: function (newVal) {
+			_moduleName = newVal;
+
+			if ("moduleLink" in this.els) {
+				$(this.els.moduleLink).html(_moduleName);
+			}
+		}
+	});
+
+	Object.defineProperty(this, "courseId", {
+		get: function () {
+			return _courseId;
+		},
+		set: function (newVal) {
+			_courseId = newVal;
+
+			if ("courseLink" in this.els) {
+				$(this.els.courseLink).attr("href", "index.php#c_" + _courseId);
+			}
+		}
+	});
+
+	Object.defineProperty(this, "courseName", {
+		get: function () {
+			return _courseName;
+		},
+		set: function (newVal) {
+			_courseName = newVal;
+
+			if ("courseLink" in this.els) {
+				$(this.els.courseLink).html(_courseName);
 			}
 		}
 	});
@@ -273,7 +337,7 @@ Video.prototype = function () {
 		}, function (data, stat) {
 			if (stat == "success") {
 				// map the data
-   			this.name = data.name;
+   			this.videoName = data.name;
 				this.sequence = parseInt(data.sequence);
    			this.moduleId = parseInt(data.moduleid);
 				this.moduleName = data.modulename;
@@ -290,7 +354,7 @@ Video.prototype = function () {
 				this.loaded = true;
 
 				// update the url to reflect the current id
-				history.pushState({}, this.name, "http://192.168.2.14/uni/video.php?vid=" + this.id);
+				history.pushState({}, this.videoName, "http://192.168.2.14/uni/video.php?vid=" + this.id);
 			} else {
 				// error
 				console.log("error condition!");

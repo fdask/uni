@@ -1,6 +1,11 @@
 <?php
 require 'header.inc.php';
 ?>
+      <nav>
+         [ <a href='index.php'>Home</a> ]
+
+			[ <a id='courseLink' href=''></a> &gt; <a id='moduleLink' href=''></a> &gt; <a id='videoLink' href='#'></a> ]
+      </nav>
       <button type='button' id='unwatch' disabled='disabled'>Clear Watches</button>
       <button type='button' id='clearBookmark' disabled='disabled'>Clear Bookmark</button>
       <button type='button' id='jumpToBookmark' disabled='disabled'>Jump To Bookmark</button>
@@ -38,7 +43,10 @@ require 'header.inc.php';
 			watchClear: "#unwatch",
 			navNext: "#nextButton",
 			navPrev: "#previousButton",
-			moduleEnd: "#playToModuleEnd"
+			moduleEnd: "#playToModuleEnd",
+			videoLink: "#videoLink",
+			moduleLink: "#moduleLink",
+			courseLink: "#courseLink"
 		});
 		</script>
 			<?php
