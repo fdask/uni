@@ -11,23 +11,6 @@ a {
 	padding-left: 5px;
 }
 
-.course {
-	font-size: 1em;
-}
-
-.module {
-	font-size: 1.1em;
-}
-
-.video {
-	font-size: 1.2em;
-}
-
-#unwatch {
-	display: block;
-	margin-top: 20px;
-}
-
 #note {
 	width: 500px;
 	height: 300px;
