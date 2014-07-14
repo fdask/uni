@@ -20,12 +20,15 @@ require 'header.inc.php';
                <button class='navbutton' id='previousButton' type='button' disabled='disabled'>Previous</button>
                <button id='addBookmark' type='button'>Add Bookmark</button>
                <button class='navbutton' id='nextButton' type='button' disabled='disabled'>Next</button>
+         		<input type='checkbox' name='playToModuleEnd' id='playToModuleEnd' /> <label for='playToModuleEnd'>Play to Module End</label>
             </div>
          </div>
 
-         <input type='checkbox' name='playToModuleEnd' id='playToModuleEnd' /> <label for='playToModuleEnd'>Play to Module End</label><br>
-         <textarea id='note'></textarea>
-         <button type='button' id='saveNote'>Save Note</button>
+			<fieldset>
+				<legend>Notes</legend>
+	         <textarea id='note'></textarea>
+	         <button type='button' id='saveNote'>Save Note</button>
+			</fieldset>
       </div>
       <div id='coursenav'>
       </div>

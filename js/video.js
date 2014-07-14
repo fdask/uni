@@ -111,7 +111,7 @@ var Video = function (id, htmlObj, autoload) {
 				if (_nextId != null) {
 					$(this.els.navNext).removeAttr("disabled");
 				} else {
-					$(this.els.navNext).attr("disabled", "disabled");
+					$(this.els.navNext).prop("disabled", true);
 				}
 			}
 		}
@@ -129,7 +129,7 @@ var Video = function (id, htmlObj, autoload) {
 				if (_prevId != null) {
 					$(this.els.navPrev).removeAttr("disabled");
 				} else {
-					$(this.els.navPrev).attr("disabled", "disabled");
+					$(this.els.navPrev).prop("disabled", true);
 				}
 			}
 		}
@@ -142,6 +142,10 @@ var Video = function (id, htmlObj, autoload) {
 		set: function (newVal) {
 			if (newVal) {
 				_lastInModule = true;
+
+				if ("navNext" in this.els) {
+					$(this.els.navNext).prop("disabled", true);
+				}
 			} else {
 				_lastInModule = false;
 			}
@@ -165,11 +169,11 @@ var Video = function (id, htmlObj, autoload) {
 				}
 			} else {
 				if ("bookmarkClear" in this.els) {
-					$(this.els.bookmarkClear).attr("disabled", "disabled");
+					$(this.els.bookmarkClear).prop("disabled", true);
 				}
 
 				if ("bookmarkJump" in this.els) {
-					$(this.els.bookmarkJump).attr("disabled", "disabled");
+					$(this.els.bookmarkJump).prop("disabled", true);
 				}
 			}
 		}
@@ -219,7 +223,7 @@ var Video = function (id, htmlObj, autoload) {
 				if (_watched) {
 					$(this.els.watchClear).removeAttr("disabled");
 				} else {
-					$(this.els.watchClear).attr("disabled", "disabled");
+					$(this.els.watchClear).prop("disabled", true);
 				}	
 			}
 		}
@@ -345,6 +349,8 @@ Video.prototype = function () {
 		});
 	},
 	load = function () {
+		this.loaded = false;
+
 		this.transmit.call(this, {
 			videoid: this.id
 		}, function (data, stat) {
@@ -383,9 +389,6 @@ Video.prototype = function () {
 			this.watchSet.call(this, $.proxy(function () {
 				if ("moduleEnd" in this.els) {
 					if ($(this.els.moduleEnd).prop("checked") && !this.lastInModule) {
-						// save any existing note
-						this.noteSet.call(this);
-
 						// advance to the next video
 						this.id = this.nextId;
 
@@ -398,9 +401,6 @@ Video.prototype = function () {
 		}
 	},
 	navNext = function () {
-		// save any existing note
-		this.noteSet.call(this);
-
 		// advance to the next video
 		this.id = this.nextId;
 
@@ -409,9 +409,6 @@ Video.prototype = function () {
 		}
 	}, 
 	navPrev = function () {
-		// save any existing note
-		this.noteSet.call(this);
-
 		// advance to the next video
 		this.id = this.prevId;
 

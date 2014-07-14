@@ -273,7 +273,7 @@ function getVideoObject($videoid) {
 		$row = mysql_fetch_assoc($res);
 		$row['navNext'] = getNextVideo($videoid);
 		$row['navPrev'] = getPrevVideo($videoid);
-		$row['last'] = (lastInModule($videoid) == $videoid) ? 1 : 0;
+		$row['last'] = (lastInModule($row['moduleid']) == $videoid) ? 1 : 0;
 
 		return $row;
 	}
