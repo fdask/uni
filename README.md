@@ -18,7 +18,7 @@ Pre-Requisites
 --------------
 Nothing abnormal is required to run.  A linux box with access to the following should suffice.
 
-* Mplayer
+* ffmpeg
 * PHP 
 * MySQL
 * Web Server (apache/nginx, etc)
