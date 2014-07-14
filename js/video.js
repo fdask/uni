@@ -1,6 +1,5 @@
 var Video = function (id, htmlObj, autoload) {
 	this.sequence = null;
-	this.lastInModule = null;
 	this.vidLength = null;
 	this.loaded = false;
 	this.autoload = autoload || true; 
@@ -20,6 +19,7 @@ var Video = function (id, htmlObj, autoload) {
 	var _moduleName = null;
 	var _moduleId = null
 	var _videoName = null;
+	var _lastInModule = null;
 
 	Object.defineProperty(this, "id", {
 		get: function () {
@@ -131,6 +131,19 @@ var Video = function (id, htmlObj, autoload) {
 				} else {
 					$(this.els.navPrev).attr("disabled", "disabled");
 				}
+			}
+		}
+	});
+
+	Object.defineProperty(this, "lastInModule", {
+		get: function () {
+			return _lastInModule;
+		},
+		set: function (newVal) {
+			if (newVal) {
+				_lastInModule = true;
+			} else {
+				_lastInModule = false;
 			}
 		}
 	});
