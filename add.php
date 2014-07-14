@@ -1,23 +1,21 @@
 #!/usr/bin/php
 <?php
-require '/usr/share/nginx/html/uni/uni.inc.php';
+$INSTALLDIR = "/usr/share/nginx/html/uni";
+$FFMPEG = "/usr/bin/ffmpeg";
+require "$INSTALLDIR/uni.inc.php";
 
-$DESTDIR = "/usr/share/nginx/html/uni/files";
+$DESTDIR = "$INSTALLDIR/files";
+
 $COURSEID = 69;
 
 $module_sequence = 0;
-$module_total = 0;
-
 $module_created = array();
 
 // for each directory in the current folder
 foreach (glob("*") as $dir) {
 	if (preg_match("@(\d+) - (.*)@", $dir, $matches)) {
-		//$module_sequence++;
-		$module_sequence = intval($matches[1]) + 1;
+		$module_sequence = intval($matches[1]);
 		$module_name = $matches[2];
-
-		$video_count = 0;
 
 		// create the module
 		$module_id = addModule($COURSEID, $module_sequence, $module_name);
@@ -29,16 +27,13 @@ foreach (glob("*") as $dir) {
 			$bits = explode("/", $file);
 
 			if (preg_match("@(\d+) ([^\.]+) 201\d+\.(mp4|wmv|mov|webm)@", end($bits), $matches2)) {
-				$video_count++;
-				$video_sequence = intval($matches2[1]) + 1;
+				$video_sequence = intval($matches2[1]);
 				$video_name = $matches2[2];
 
 				// create the video
 				addVideo($module_id, $video_sequence, $video_name, $file);
 			}
 		}
-
-		$module_total += $video_count;
 	}
 }
 
@@ -57,7 +52,7 @@ while ($row = mysql_fetch_assoc($res)) {
    if (strpos($row['location'], "files/") !== 0) {
       if (strpos($file, ".wmv") !== false || strpos($file, ".mov") !== false || strpos($file, ".webm") !== false) {
          $newfile = $row['id'] . "_" . str_replace(array(".wmv", ".mov", ".webm"), ".mp4", $file);
-         shell_exec("/usr/bin/ffmpeg -i " . escapeshellarg($full) . " -vcodec libx264 -vpre medium $DESTDIR/" . escapeshellarg($newfile));
+         shell_exec("$FFMPEG -i " . escapeshellarg($full) . " -vcodec libx264 -vpre medium $DESTDIR/" . escapeshellarg($newfile));
       } else {
          $newfile = $row['id'] . "_" . $file;
          copy($full, "$DESTDIR/$newfile");
@@ -84,7 +79,7 @@ $res = mysql_query($query);
 while ($row = mysql_fetch_assoc($res)) {
    $location = "$DESTDIR/" . basename($row['location']);
 
-   $cap = shell_exec("ffmpeg -i " . escapeshellarg($location) . " 2>&1 | grep Duration | awk '{print $2}' | tr -d ,");
+   $cap = shell_exec("$FFMPEG -i " . escapeshellarg($location) . " 2>&1 | grep Duration | awk '{print $2}' | tr -d ,");
 
    $bits = explode(":", $cap);
    $mins = $bits[1];

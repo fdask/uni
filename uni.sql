@@ -42,7 +42,7 @@ CREATE TABLE `courses` (
   `company` varchar(255) DEFAULT NULL,
   `link` text,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=33 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=70 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -58,7 +58,7 @@ CREATE TABLE `modules` (
   `name` varchar(255) DEFAULT NULL,
   `sequence` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=338 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=543 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -74,7 +74,7 @@ CREATE TABLE `notes` (
   `note` text,
   PRIMARY KEY (`id`),
   UNIQUE KEY `videoid` (`videoid`)
-) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=112 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -92,7 +92,7 @@ CREATE TABLE `videos` (
   `location` text,
   `sequence` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2480 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=4182 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -117,4 +117,4 @@ CREATE TABLE `watched` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-06-13 10:33:58
+-- Dump completed on 2014-07-13 22:26:08
