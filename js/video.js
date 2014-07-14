@@ -108,7 +108,7 @@ var Video = function (id, htmlObj, autoload) {
 
 			// enable the navNext button
 			if ("navNext" in this.els) {
-				if (_nextId != null) {
+				if (_nextId) {
 					$(this.els.navNext).removeAttr("disabled");
 				} else {
 					$(this.els.navNext).prop("disabled", true);
@@ -126,7 +126,7 @@ var Video = function (id, htmlObj, autoload) {
 
 			// enable the navPrev button
 			if ("navPrev" in this.els) {
-				if (_prevId != null) {
+				if (_prevId) {
 					$(this.els.navPrev).removeAttr("disabled");
 				} else {
 					$(this.els.navPrev).prop("disabled", true);
@@ -142,10 +142,6 @@ var Video = function (id, htmlObj, autoload) {
 		set: function (newVal) {
 			if (newVal) {
 				_lastInModule = true;
-
-				if ("navNext" in this.els) {
-					$(this.els.navNext).prop("disabled", true);
-				}
 			} else {
 				_lastInModule = false;
 			}
@@ -159,7 +155,7 @@ var Video = function (id, htmlObj, autoload) {
 		set: function (newVal) {
 			_bookmark = newVal;
 
-			if (_bookmark != null) {
+			if (_bookmark) {
 				if ("bookmarkClear" in this.els) {
 					$(this.els.bookmarkClear).removeAttr("disabled");
 				}
@@ -197,12 +193,9 @@ var Video = function (id, htmlObj, autoload) {
 		set: function (newVal) {
 			_videoSrc = newVal;
 
-			if (_videoSrc != null) {
+			if (_videoSrc) {
 				if ("video" in this.els) {
-					// update the src attribute for the video
 					$(this.els.video).attr("src", _videoSrc);	
-
-					// 
 				} 
 			} 
 		}
