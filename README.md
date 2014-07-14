@@ -42,13 +42,13 @@ Right now the course import is a little rough, and requires a lot of steps.  Hop
 ####Note Before Import
 This application assumes the following structure for your course files.
 
-CourseName/
-	1. Module One/
-		1. Video File One.mp4
-		2. Video Two.avi
-	2. Module Two/
-		1. The Best Module!
-		2. Summary
+	CourseName/
+		1. Module One/
+			1. Video File One.mp4
+			2. Video Two.avi
+		2. Module Two/
+			1. The Best Module!
+			2. Summary
 
 The import process uses the numbering on the module folders, and video filenames to determine the correct sequence for the course playlist.  Spacing, punctuation, etc, can vary as regular expressions are used for the matching.
 
@@ -56,9 +56,11 @@ If your files do not follow this structure, you will have to manually adjust it 
 
 ####Add the Course
 An entry in the 'courses' table needs to be manually added as the first step.  Load up your MySQL CLI and do something like:
+
 ```INSERT INTO courses (name, company, link) VALUES ('The Best Math Course', 'Open Source Inc.', 'http://www.opensourcecourse.com');```
 
 Only the name field is required here.  Company and link are just there for reference. Make note of the id of this newly inserted course.
+
 ```SELECT LAST_INSERT_ID();```
 
 ####Update the import script 
@@ -94,8 +96,12 @@ if (preg_match("@(\d+) ([^\.]+) 201\d+\.(mp4|wmv|mov|webm)@", end($bits), $match
 	$video_name = $matches2[2];
 ```
 
+####Create the files directory
+All the MP4 files this application uses will be stored in a 'files/' folder.  The repo currently has a symlink instead of an actual directory, so you'll probably need to delete it and either create an actual directory, or another symlink.
+
 ####Run the import script
 You want to be inside the course folder (viewing a listing of the module folders) when you run add.php.   The flow of add.php goes as follows:
+
 1. Scan the files and folders in the current directly, adding the modules and video details into the database.
 2. For all the video files just added to the database, run them through ffmpeg, converting to mp4 if necessary, saving the output to the files/ directory in the codebase.  Your original files are left untouched.
 3. The new mp4s in the files/ directory are scanned, updating the length column in the videos table.
