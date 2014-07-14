@@ -383,6 +383,9 @@ Video.prototype = function () {
 			this.watchSet.call(this, $.proxy(function () {
 				if ("moduleEnd" in this.els) {
 					if ($(this.els.moduleEnd).prop("checked") && !this.lastInModule) {
+						// save any existing note
+						this.noteSet.call(this);
+
 						// advance to the next video
 						this.id = this.nextId;
 
@@ -395,6 +398,9 @@ Video.prototype = function () {
 		}
 	},
 	navNext = function () {
+		// save any existing note
+		this.noteSet.call(this);
+
 		// advance to the next video
 		this.id = this.nextId;
 
@@ -403,6 +409,9 @@ Video.prototype = function () {
 		}
 	}, 
 	navPrev = function () {
+		// save any existing note
+		this.noteSet.call(this);
+
 		// advance to the next video
 		this.id = this.prevId;
 
